@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyinsee"
+version = "0.1.0"
+description = "A package for collecting and processing company data from INSEE API"
+readme = "README.md"
+authors = [{name = "Ayman KUMA", email = "aymankamel.mail@example.com"}]
+license = {file = "LICENSE"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["insee", "api", "company data"]
+dependencies = [
+    "requests",
+    "python-dotenv",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/AymanKUMA/insee-client"
+
+[project.scripts]
+setup-cli = "pyinsee.setup_cli:main"
+insee-cli = "pyinsee.insee_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
