@@ -8,7 +8,7 @@ import logging
 import re
 from pathlib import Path
 
-# Define the directories
+# Define the directories to use
 BASE_DIR = Path.cwd() / "data"
 LOGS_DIR = BASE_DIR / "logs"
 METADATA_DIR = BASE_DIR / "metadata"
