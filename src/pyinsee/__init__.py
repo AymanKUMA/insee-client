@@ -1,0 +1,1 @@
+"""insee_client package."""
