@@ -43,7 +43,8 @@ def parse_args() -> argparse.Namespace:
                              help="Start date or number")
     bulk_parser.add_argument("--nombre",
                              type=str,
-                             help="Number of items")
+                             help="Number of items",
+                             default=20)
     bulk_parser.add_argument("--tri",
                              type=str,
                              nargs="*",
@@ -56,7 +57,7 @@ def parse_args() -> argparse.Namespace:
                              type=str,
                              nargs="*",
                              help="Facette fields")
-    bulk_parser.add_argument("--masquerValeursNulles",
+    bulk_parser.add_argument("--mvn",
                              type=str,
                              help="Hide null values (true/false)")
 
@@ -76,7 +77,7 @@ def parse_args() -> argparse.Namespace:
                                   type=str,
                                   nargs="*",
                                   help="Fields to retrieve")
-    by_number_parser.add_argument("--masquerValeursNulles",
+    by_number_parser.add_argument("--mvn",
                                   type=str,
                                   help="Hide null values (true/false)")
     return parser.parse_args()

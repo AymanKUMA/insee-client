@@ -49,33 +49,41 @@ def create_or_update_env_file(env_path, log_dir, env_file_path, consumer_key, co
     
     print(f".env file created/updated at: {env_path}")
 
-def print_example(): 
-    """Prints the default .env file.""" 
-    path_to_example = (Path(__file__).parent).parent / "example.env"
-    print(f"Example .env file path: {path_to_example}")
+def print_example() -> None:
+    """Prints the default .env file.
+
+    return : None
+    """
+    path_to_example: Path = Path(__file__).parents[2] / "example.env"
     print("Here is the example .env file:")
     for line in path_to_example.read_text().splitlines():
         print(line)
 
-def create_default_env_file(env_file_path):
-    """Creates a default.env file with the path to the .env file."""
-    package_dir = (Path(__file__).parent).parent
+def create_default_env_file(env_file_path: Path) -> None:
+    """Creates a default.env file with the path to the .env file.
+
+    Args:
+        env_file_path (Path): The path to the .env file.
+
+    Returns:
+        None
+    """
+    package_dir: Path = Path(__file__).parent[2]
     print(f"Package directory: {package_dir}")
-    default_env_path = package_dir / "default.env"
+    default_env_path: Path = package_dir / "default.env"
     
     with open(default_env_path, 'w') as f:
         f.write(f"ENV_FILE_PATH={env_file_path}")
     print(f"default.env file created at: {default_env_path}")
 
-
-def setup_env():
+def setup_env(env_path: Path = Path(".env")) -> None:
     """CLI for setting up the .env environment file with user input.
 
-        Args:
-            None
+    Args:
+        env_path (Path, optional): Path to an existing .env file or directory where a new one should be created. Defaults to ".env".
     
-        Returns:
-            None
+    Returns:
+        None
 
             
     """
@@ -83,9 +91,9 @@ def setup_env():
     
     parser.add_argument(
         '--env-path', 
-        type=str, 
+        type=Path, 
         help="Path to an existing .env file or directory where a new one should be created.",
-        default=".env"
+        default=Path(".env")
     )
 
     parser.add_argument(
@@ -100,7 +108,7 @@ def setup_env():
         print_example()
         return
 
-    env_path = Path(args.env_path)
+    env_path = args.env_path
     
     # Check if user provided a directory or file path
     if env_path.is_dir():
@@ -108,11 +116,11 @@ def setup_env():
     else:
         env_file_path = env_path
     
-    log_dir = ""
-    env_file_path_input = ""
-    consumer_key = ""
-    consumer_secret = ""
-    insee_data_url = ""
+    log_dir: str = ""
+    env_file_path_input: str = ""
+    consumer_key: str = ""
+    consumer_secret: str = ""
+    insee_data_url: str = ""
 
     if env_file_path.exists():
         create_or_update_env_file(env_file_path, log_dir, env_file_path_input, consumer_key, consumer_secret, insee_data_url)
