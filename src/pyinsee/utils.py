@@ -4,7 +4,7 @@ from __future__ import annotations
 import csv
 import datetime as dt
 import json
-import logging
+from .logger import logger
 import re
 from pathlib import Path
 
@@ -21,12 +21,6 @@ QUERY_URL_REGEX = r"(?:[^=&]+=[^=&]*&?)*"
 # Create directories if they don't exist
 for directory in [LOGS_DIR, METADATA_DIR, RAW_DIR, PROCESSED_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
-
-def setup_logging() -> None:
-    """Set up logging."""
-    logging.basicConfig(level=logging.INFO)
-    return logging.getLogger(__name__)
-
 
 class QueryBuilder:
     """To build the query string from kwargs."""
@@ -95,11 +89,9 @@ class QueryBuilder:
         query_string = "&".join(query_string_parts)
         match = re.match(QUERY_URL_REGEX, query_string)
         if match:
-            logging.basicConfig(level=logging.INFO)
-            logging.info(" Valid query string")
+            logger.info("Valid query string")
         if not match:
-            logging.basicConfig(level=logging.ERROR)
-            logging.error(" Invalid query string")
+            logger.error("Invalid query string")
             return ""
 
         return "&".join(query_string_parts)
@@ -127,8 +119,7 @@ def save_data(data: dict,
 
     Returns:
         None
-    """  # noqa: E501
-    logging.basicConfig(level=logging.INFO)
+    """
 
     # Determine the correct directory based on data_type
     if data_type == "logs":
@@ -145,11 +136,11 @@ def save_data(data: dict,
 
     # Save the data
     if response_type == "json":
-        logging.info(" Saving data to %s...", file_path)
+        logger.info("Saving data to %s...", file_path)
         with file_path.open("w") as f:
             json.dump(data, f)
     elif response_type == "csv":
-        logging.info(" Saving data to %s...", file_path)
+        logger.info("Saving data to %s...", file_path)
         with file_path.open("w", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(data)
@@ -157,7 +148,7 @@ def save_data(data: dict,
         msg = "Unsupported response_type. Must be 'json' or 'csv'."
         raise ValueError(msg)
 
-    logging.info(" Data successfully saved to %s", file_path)
+    logger.info(" Data successfully saved to %s", file_path)
 
 if __name__ == "__main__":
     # Saving raw data

@@ -1,21 +1,16 @@
 """insee client CLI module."""
 from __future__ import annotations
 
+import logging
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 import argparse
-import logging
+from .logger import logger
 import sys
 
 from .insee_client import InseeClient
-
-def setup_logging() -> None:
-    """Set up logging."""
-    logging.basicConfig(level=logging.INFO)
-    return logging.getLogger("insee-CLI")
-
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
@@ -84,7 +79,6 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     """Main function."""
-    logger = setup_logging()
     args = parse_args()
 
     # Create an instance of InseeClient

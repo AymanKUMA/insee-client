@@ -1,8 +1,20 @@
 import argparse
 from pathlib import Path
 
-def create_or_update_env_file(env_path, log_dir, env_file_path, consumer_key, consumer_secret, insee_data_url):
-    """Creates or updates the .env file with user-provided environment variables."""
+def create_or_update_env_file(env_path: Path, log_dir: str, env_file_path: str, consumer_key: str, consumer_secret: str, insee_data_url: str) -> None:
+    """Creates or updates the .env file with user-provided environment variables.
+
+    Args:
+        env_path (Path): The path to the .env file.
+        log_dir (str): The log directory.
+        env_file_path (str): The path to the .env file.
+        consumer_key (str): The consumer key.
+        consumer_secret (str): The consumer secret.
+        insee_data_url (str): The INSEE data URL.
+
+    Returns:
+        None
+    """
     env_vars = {
         'LOG_DIR': log_dir,
         'ENV_FILE_PATH': env_file_path,
@@ -52,7 +64,8 @@ def create_or_update_env_file(env_path, log_dir, env_file_path, consumer_key, co
 def print_example() -> None:
     """Prints the default .env file.
 
-    return : None
+    Returns:
+        None
     """
     path_to_example: Path = Path(__file__).parents[2] / "example.env"
     print("Here is the example .env file:")
@@ -60,7 +73,7 @@ def print_example() -> None:
         print(line)
 
 def create_default_env_file(env_file_path: Path) -> None:
-    """Creates a default.env file with the path to the .env file.
+    """Creates a default.env file with the path to the .env file if it doesn't exist.
 
     Args:
         env_file_path (Path): The path to the .env file.
@@ -68,24 +81,25 @@ def create_default_env_file(env_file_path: Path) -> None:
     Returns:
         None
     """
-    package_dir: Path = Path(__file__).parent[2]
+    package_dir: Path = Path(__file__).parent
     print(f"Package directory: {package_dir}")
     default_env_path: Path = package_dir / "default.env"
     
     with open(default_env_path, 'w') as f:
         f.write(f"ENV_FILE_PATH={env_file_path}")
-    print(f"default.env file created at: {default_env_path}")
+    print(f"default.env file created/updated at: {default_env_path}")
 
 def setup_env(env_path: Path = Path(".env")) -> None:
     """CLI for setting up the .env environment file with user input.
 
     Args:
         env_path (Path, optional): Path to an existing .env file or directory where a new one should be created. Defaults to ".env".
-    
+
     Returns:
         None
 
-            
+    Raises:          
+        argparse.ArgumentTypeError: If the provided path is not a valid .env file or directory.  
     """
     parser = argparse.ArgumentParser(description="Set up the environment variables for the project.")
     
@@ -102,20 +116,20 @@ def setup_env(env_path: Path = Path(".env")) -> None:
         help="Print an example .env file."
     )
 
-    args = parser.parse_args()
+    args: argparse.Namespace = parser.parse_args()
     
     if args.example:
         print_example()
         return
 
-    env_path = args.env_path
+    env_path: Path = args.env_path
     
     # Check if user provided a directory or file path
     if env_path.is_dir():
-        env_file_path = env_path / ".env"
+        env_file_path: Path = env_path / ".env"
     else:
-        env_file_path = env_path
-    
+        env_file_path: Path = env_path
+
     log_dir: str = ""
     env_file_path_input: str = ""
     consumer_key: str = ""
@@ -124,17 +138,17 @@ def setup_env(env_path: Path = Path(".env")) -> None:
 
     if env_file_path.exists():
         create_or_update_env_file(env_file_path, log_dir, env_file_path_input, consumer_key, consumer_secret, insee_data_url)
-        env_file_path_input = str(env_file_path)
+        env_file_path_input: str = str(env_file_path)
         create_default_env_file(env_file_path_input)
     else:
-        log_dir = input("Enter the logs output directory (default 'logs'): ") or "logs"
-        env_file_path_input = str(env_file_path)
-        consumer_key = input("Enter your Insee API consumer key: ")
-        consumer_secret = input("Enter your Insee API consumer secret: ")
-        insee_data_url = input("Enter the basic API URL (default 'https://api.insee.fr/entreprises/sirene/V3.11/'): ") or "https://api.insee.fr/entreprises/sirene/V3.11/"
-        
+        log_dir: str = input("Enter the logs output directory (default 'logs'): ") or "logs"
+        env_file_path_input: str = str(env_file_path)
+        consumer_key: str = input("Enter your Insee API consumer key: ")
+        consumer_secret: str = input("Enter your Insee API consumer secret: ")
+        insee_data_url: str = input("Enter the basic API URL (default 'https://api.insee.fr/entreprises/sirene/V3.11/'): ") or "https://api.insee.fr/entreprises/sirene/V3.11/"
+
         create_or_update_env_file(env_file_path, log_dir, env_file_path_input, consumer_key, consumer_secret, insee_data_url)
-    
+
         create_default_env_file(env_file_path_input)
 
 def main(): 
