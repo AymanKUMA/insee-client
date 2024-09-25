@@ -7,20 +7,29 @@ import json
 from .logger import logger
 import re
 from pathlib import Path
-
-# Define the directories to use
-BASE_DIR = Path.cwd() / "data"
-LOGS_DIR = BASE_DIR / "logs"
-METADATA_DIR = BASE_DIR / "metadata"
-RAW_DIR = BASE_DIR / "raw"
-PROCESSED_DIR = BASE_DIR / "processed"
+from .config import DATA_DIR
 
 # Define the regex patterns
 QUERY_URL_REGEX = r"(?:[^=&]+=[^=&]*&?)*"
 
-# Create directories if they don't exist
-for directory in [LOGS_DIR, METADATA_DIR, RAW_DIR, PROCESSED_DIR]:
-    directory.mkdir(parents=True, exist_ok=True)
+def create_data_directories(base_dir: Path) -> None:
+    """Creates necessary data directories if they don't exist.
+
+    Args:
+        base_dir (Path): The base directory for data storage.
+
+    Returns:
+        None
+    """
+    LOGS_DIR = base_dir / "logs"
+    METADATA_DIR = base_dir / "metadata"
+    RAW_DIR = base_dir / "raw"
+    PROCESSED_DIR = base_dir / "processed"
+
+    for directory in [LOGS_DIR, METADATA_DIR, RAW_DIR, PROCESSED_DIR]:
+        directory.mkdir(parents=True, exist_ok=True)
+
+create_data_directories(Path(DATA_DIR))
 
 class QueryBuilder:
     """To build the query string from kwargs."""
