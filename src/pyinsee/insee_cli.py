@@ -1,7 +1,6 @@
 """insee client CLI module."""
 from __future__ import annotations
 
-import logging
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -81,6 +80,21 @@ def main() -> None:
     """Main function."""
     args = parse_args()
 
+    title = """
+
+    ██████╗ ██╗   ██╗██╗███╗   ██╗███████╗███████╗███████╗
+    ██╔══██╗╚██╗ ██╔╝██║████╗  ██║██╔════╝██╔════╝██╔════╝
+    ██████╔╝ ╚████╔╝ ██║██╔██╗ ██║███████╗█████╗  █████╗  
+    ██╔═══╝   ╚██╔╝  ██║██║╚██╗██║╚════██║██╔══╝  ██╔══╝  
+    ██║        ██║   ██║██║ ╚████║███████║███████╗███████╗
+    ╚═╝        ╚═╝   ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝
+    pyinsee v0.1.0   |   github.com/AymanKUMA/insee-client
+    ------------------------------------------------------
+    Welcome to the INSEE API CLI application . . . . . . . 
+    """
+
+    print(title)
+
     # Create an instance of InseeClient
     client = InseeClient(content_type="json")
 
@@ -92,6 +106,9 @@ def main() -> None:
                                                                        "",
                                                                        [],
                                                                        {}]}
+        # To ensure that the masquerValeursNulles parameter is correctly set as a key
+        if 'mvn' in kwargs.keys():
+            kwargs['masquerValeursNulles'] = kwargs.pop('mvn')
         try:
             logger.info("CLI command: insee_get_bulk | Fetching bulk data ...")
             response = client.get_bulk(data_type=args.data_type, **kwargs)
@@ -109,6 +126,9 @@ def main() -> None:
                                                                                   "",
                                                                                   [],
                                                                                   {}]}
+        # To ensure that the masquerValeursNulles parameter is correctly set as a key
+        if 'mvn' in kwargs.keys():
+            kwargs['masquerValeursNulles'] = kwargs.pop('mvn')
         try:
             logger.info("CLI command: insee_get_by_number | Fetching legal data ...")
             response = client.get_by_number(data_type=args.data_type,
