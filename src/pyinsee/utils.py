@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import datetime as dt
 import json
+import os
 from .logger import logger
 import re
 from pathlib import Path
@@ -132,16 +133,18 @@ def save_data(data: dict,
 
     # Determine the correct directory based on data_type
     if data_type == "logs":
-        save_dir = LOGS_DIR
+        save_dir = os.path.join(Path(DATA_DIR), "logs")
     elif data_type == "metadata":
-        save_dir = METADATA_DIR
+        save_dir = os.path.join(Path(DATA_DIR), "metadata")
     elif data_type == "processed":
-        save_dir = PROCESSED_DIR
+        save_dir = os.path.join(Path(DATA_DIR), "processed")
     else:  # Default to raw
-        save_dir = RAW_DIR
+        save_dir = os.path.join(Path(DATA_DIR), "raw")
+    
+    print(save_dir)
 
     # Build the full file path
-    file_path = save_dir / filename
+    file_path = Path(save_dir) / filename
 
     # Save the data
     if response_type == "json":
@@ -170,4 +173,4 @@ if __name__ == "__main__":
     save_data(data=[["header1", "header2"], ["row1_col1", "row1_col2"]],
               filename="processed_data.csv",
               response_type="csv",
-              data_type="raw")
+              data_type="processed")
