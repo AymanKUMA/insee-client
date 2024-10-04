@@ -141,18 +141,20 @@ def save_data(data: dict,
     else:  # Default to raw
         save_dir = os.path.join(Path(DATA_DIR), "raw")
     
-    print(save_dir)
+    # Create the directory if it doesn't exist
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
 
     # Build the full file path
     file_path = Path(save_dir) / filename
 
     # Save the data
     if response_type == "json":
-        logger.info("Saving data to %s...", file_path)
+        logger.debug("Saving data to %s...", file_path)
         with file_path.open("w") as f:
             json.dump(data, f)
     elif response_type == "csv":
-        logger.info("Saving data to %s...", file_path)
+        logger.debug("Saving data to %s...", file_path)
         with file_path.open("w", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(data)
@@ -160,7 +162,8 @@ def save_data(data: dict,
         msg = "Unsupported response_type. Must be 'json' or 'csv'."
         raise ValueError(msg)
 
-    logger.info(" Data successfully saved to %s", file_path)
+    logger.info("%s data saved successfully.", str(data_type).capitalize())
+    logger.debug(" Data successfully saved to %s", file_path)
 
 if __name__ == "__main__":
     # Saving raw data
