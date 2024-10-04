@@ -4,29 +4,33 @@ from __future__ import annotations
 import csv
 import datetime as dt
 import json
-import logging
+import os
+from .logger import logger
 import re
 from pathlib import Path
-
-# Define the directories
-BASE_DIR = Path.cwd() / "data"
-LOGS_DIR = BASE_DIR / "logs"
-METADATA_DIR = BASE_DIR / "metadata"
-RAW_DIR = BASE_DIR / "raw"
-PROCESSED_DIR = BASE_DIR / "processed"
+from .config import DATA_DIR
 
 # Define the regex patterns
 QUERY_URL_REGEX = r"(?:[^=&]+=[^=&]*&?)*"
 
-# Create directories if they don't exist
-for directory in [LOGS_DIR, METADATA_DIR, RAW_DIR, PROCESSED_DIR]:
-    directory.mkdir(parents=True, exist_ok=True)
+def create_data_directories(base_dir: Path) -> None:
+    """Creates necessary data directories if they don't exist.
 
-def setup_logging() -> None:
-    """Set up logging."""
-    logging.basicConfig(level=logging.INFO)
-    return logging.getLogger(__name__)
+    Args:
+        base_dir (Path): The base directory for data storage.
 
+    Returns:
+        None
+    """
+    LOGS_DIR = base_dir / "logs"
+    METADATA_DIR = base_dir / "metadata"
+    RAW_DIR = base_dir / "raw"
+    PROCESSED_DIR = base_dir / "processed"
+
+    for directory in [LOGS_DIR, METADATA_DIR, RAW_DIR, PROCESSED_DIR]:
+        directory.mkdir(parents=True, exist_ok=True)
+
+create_data_directories(Path(DATA_DIR))
 
 class QueryBuilder:
     """To build the query string from kwargs."""
@@ -95,11 +99,9 @@ class QueryBuilder:
         query_string = "&".join(query_string_parts)
         match = re.match(QUERY_URL_REGEX, query_string)
         if match:
-            logging.basicConfig(level=logging.INFO)
-            logging.info(" Valid query string")
+            logger.info("Valid query string")
         if not match:
-            logging.basicConfig(level=logging.ERROR)
-            logging.error(" Invalid query string")
+            logger.error("Invalid query string")
             return ""
 
         return "&".join(query_string_parts)
@@ -127,29 +129,30 @@ def save_data(data: dict,
 
     Returns:
         None
-    """  # noqa: E501
-    logging.basicConfig(level=logging.INFO)
+    """
 
     # Determine the correct directory based on data_type
     if data_type == "logs":
-        save_dir = LOGS_DIR
+        save_dir = os.path.join(Path(DATA_DIR), "logs")
     elif data_type == "metadata":
-        save_dir = METADATA_DIR
+        save_dir = os.path.join(Path(DATA_DIR), "metadata")
     elif data_type == "processed":
-        save_dir = PROCESSED_DIR
+        save_dir = os.path.join(Path(DATA_DIR), "processed")
     else:  # Default to raw
-        save_dir = RAW_DIR
+        save_dir = os.path.join(Path(DATA_DIR), "raw")
+    
+    print(save_dir)
 
     # Build the full file path
-    file_path = save_dir / filename
+    file_path = Path(save_dir) / filename
 
     # Save the data
     if response_type == "json":
-        logging.info(" Saving data to %s...", file_path)
+        logger.info("Saving data to %s...", file_path)
         with file_path.open("w") as f:
             json.dump(data, f)
     elif response_type == "csv":
-        logging.info(" Saving data to %s...", file_path)
+        logger.info("Saving data to %s...", file_path)
         with file_path.open("w", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(data)
@@ -157,7 +160,7 @@ def save_data(data: dict,
         msg = "Unsupported response_type. Must be 'json' or 'csv'."
         raise ValueError(msg)
 
-    logging.info(" Data successfully saved to %s", file_path)
+    logger.info(" Data successfully saved to %s", file_path)
 
 if __name__ == "__main__":
     # Saving raw data
@@ -170,4 +173,4 @@ if __name__ == "__main__":
     save_data(data=[["header1", "header2"], ["row1_col1", "row1_col2"]],
               filename="processed_data.csv",
               response_type="csv",
-              data_type="raw")
+              data_type="processed")

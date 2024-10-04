@@ -6,16 +6,10 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 import argparse
-import logging
+from .logger import logger
 import sys
 
 from .insee_client import InseeClient
-
-def setup_logging() -> None:
-    """Set up logging."""
-    logging.basicConfig(level=logging.INFO)
-    return logging.getLogger("insee-CLI")
-
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
@@ -43,7 +37,8 @@ def parse_args() -> argparse.Namespace:
                              help="Start date or number")
     bulk_parser.add_argument("--nombre",
                              type=str,
-                             help="Number of items")
+                             help="Number of items",
+                             default=20)
     bulk_parser.add_argument("--tri",
                              type=str,
                              nargs="*",
@@ -56,7 +51,7 @@ def parse_args() -> argparse.Namespace:
                              type=str,
                              nargs="*",
                              help="Facette fields")
-    bulk_parser.add_argument("--masquerValeursNulles",
+    bulk_parser.add_argument("--mvn",
                              type=str,
                              help="Hide null values (true/false)")
 
@@ -76,15 +71,29 @@ def parse_args() -> argparse.Namespace:
                                   type=str,
                                   nargs="*",
                                   help="Fields to retrieve")
-    by_number_parser.add_argument("--masquerValeursNulles",
+    by_number_parser.add_argument("--mvn",
                                   type=str,
                                   help="Hide null values (true/false)")
     return parser.parse_args()
 
 def main() -> None:
     """Main function."""
-    logger = setup_logging()
     args = parse_args()
+
+    title = """
+
+    ██████╗ ██╗   ██╗██╗███╗   ██╗███████╗███████╗███████╗
+    ██╔══██╗╚██╗ ██╔╝██║████╗  ██║██╔════╝██╔════╝██╔════╝
+    ██████╔╝ ╚████╔╝ ██║██╔██╗ ██║███████╗█████╗  █████╗  
+    ██╔═══╝   ╚██╔╝  ██║██║╚██╗██║╚════██║██╔══╝  ██╔══╝  
+    ██║        ██║   ██║██║ ╚████║███████║███████╗███████╗
+    ╚═╝        ╚═╝   ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝
+    pyinsee v0.1.0   |   github.com/AymanKUMA/insee-client
+    ------------------------------------------------------
+    Welcome to the INSEE API CLI application . . . . . . . 
+    """
+
+    print(title)
 
     # Create an instance of InseeClient
     client = InseeClient(content_type="json")
@@ -97,6 +106,9 @@ def main() -> None:
                                                                        "",
                                                                        [],
                                                                        {}]}
+        # To ensure that the masquerValeursNulles parameter is correctly set as a key
+        if 'mvn' in kwargs.keys():
+            kwargs['masquerValeursNulles'] = kwargs.pop('mvn')
         try:
             logger.info("CLI command: insee_get_bulk | Fetching bulk data ...")
             response = client.get_bulk(data_type=args.data_type, **kwargs)
@@ -114,6 +126,9 @@ def main() -> None:
                                                                                   "",
                                                                                   [],
                                                                                   {}]}
+        # To ensure that the masquerValeursNulles parameter is correctly set as a key
+        if 'mvn' in kwargs.keys():
+            kwargs['masquerValeursNulles'] = kwargs.pop('mvn')
         try:
             logger.info("CLI command: insee_get_by_number | Fetching legal data ...")
             response = client.get_by_number(data_type=args.data_type,
