@@ -11,9 +11,13 @@ import logging
 from pathlib import Path
 from dotenv import load_dotenv
 
+# setting up the logger
+logging.getLogger(__name__)
+
+
 def get_env_file_path():
     """Load the path to the default.env file from the package directory."""
-    package_dir = (Path(__file__).parent).parent  # Directory where this default env file is located
+    package_dir = Path(__file__).parent # Directory where this default env file is located
     default_env_path = package_dir / "default.env"
     
     if not default_env_path.exists():
@@ -21,9 +25,9 @@ def get_env_file_path():
     
     return str(default_env_path)
 
-default_env_path = get_env_file_path()
+DEFAULT_ENV_PATH = get_env_file_path()
 
-load_dotenv(dotenv_path=default_env_path)
+load_dotenv(dotenv_path=DEFAULT_ENV_PATH)
 ENV_FILE_PATH = os.getenv("ENV_FILE_PATH")
 if ENV_FILE_PATH is None:
     msg = "ENV_FILE_PATH is not set in the environment variables."
@@ -31,32 +35,20 @@ if ENV_FILE_PATH is None:
 
 load_dotenv(ENV_FILE_PATH)
 
-# Retrieve the log directory from environment variables
-LOG_DIR = os.getenv("LOG_DIR", "logs")
-
-# Ensure the log directory exists
-Path(LOG_DIR).mkdir(parents=True, exist_ok=True)
-
-# Set up logging
-LOG_FILE = os.path.join(LOG_DIR, "insee_client.log")
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(levelname)s | %(asctime)s | %(name)s : %(message)s",
-    handlers=[logging.FileHandler(LOG_FILE), logging.StreamHandler()]
-)
-
+DATA_DIR = os.environ.get("DATA_DIR")
 CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
 CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
+INSEE_DATA_URL = os.environ.get("INSEE_DATA_URL")
 
+if DATA_DIR is None:
+    msg = "DATA_DIR is not set in the environment variables."
+    raise ValueError(msg)
 if CONSUMER_KEY is None:
     msg = "CONSUMER_KEY is not set in the environment variables."
     raise ValueError(msg)
 if CONSUMER_SECRET is None:
     msg = "CONSUMER_SECRET is not set in the environment variables."
     raise ValueError(msg)
-
-INSEE_DATA_URL = os.environ.get("INSEE_DATA_URL")
-
 if INSEE_DATA_URL is None:
     msg = "INSEE_DATA_URL is not set in the environment variables."
     raise ValueError(msg)

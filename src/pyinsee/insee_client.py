@@ -33,7 +33,7 @@ from __future__ import annotations
 
 import base64
 import json
-import logging
+from .logger import logger
 import pprint  # noqa: F401
 from typing import ClassVar, TypedDict
 
@@ -47,11 +47,7 @@ from .config import (
 )
 from .utils import QueryBuilder
 
-# set up logging
-logging.basicConfig(level=logging.INFO,
-                    format="%(levelname)s \
-| %(asctime)s | %(name)s | %(levelname)s : %(message)s")
-
+# adding the query bulder to the class
 QUERY_BUILDER = QueryBuilder()
 
 class BulkParams(TypedDict, total=False):
@@ -151,9 +147,8 @@ class InseeClient:
 
         # Only request a new API key if it's not already set
         if cls.__api_key is None:
-            logging.info("Fetching new API key from INSEE.")
+            logger.info("Fetching new API key from INSEE.")
             cls._fetch_api_key()
-            print(cls.__api_key)
 
     @classmethod
     def _fetch_api_key(cls) -> None:
@@ -171,19 +166,19 @@ class InseeClient:
             try:
                 data = response.json()
                 msg = f" Expires in: {data.get("expires_in")} Seconds"
-                logging.warning(msg)
+                logger.warning(msg)
                 msg = f" Token type: {data.get("token_type")}"
-                logging.warning(msg)
+                logger.warning(msg)
                 cls.__api_key = data.get("access_token")
-                logging.info("API key retrieved successfully.")
+                logger.info("API key retrieved successfully.")
             except json.JSONDecodeError:
-                logging.exception("Failed to decode JSON response for API key.")
+                logger.exception("Failed to decode JSON response for API key.")
                 msg = "Invalid API response."
                 raise ValueError(msg) from json.JSONDecodeError
         else:
             msg = f"Failed to authenticate with INSEE: {
                 response.status_code}, {response.text}"
-            logging.error(msg)
+            logger.error(msg)
             msg = "Failed to authenticate with INSEE API."
             raise ValueError(msg)
 
@@ -214,7 +209,7 @@ class InseeClient:
         Raises:
             ValueError: If the content type is not 'json' or 'csv'.
         """
-        logging.info(" Setting headers' content type...")
+        logger.info("Setting headers' content type...")
         if content_type == "json":
             self.headers["Accept"] = "application/json"
         elif content_type == "csv":
@@ -222,8 +217,8 @@ class InseeClient:
         else:
             msg = "Unsupported content type. Use 'json' or 'csv'."
             raise ValueError(msg)
-        msg = f" Content type is set to {content_type}."
-        logging.info(msg)
+        msg = f"Content type is set to {content_type}."
+        logger.info(msg)
 
     def _get_headers(self) -> dict:
         """Get the headers for the API request.
@@ -254,19 +249,19 @@ class InseeClient:
         Raises:
             requests.exceptions.RequestException: If the request fails.
         """
-        logging.info("Requesting %s", context)
+        logger.info("Requesting %s", context)
         try:
             response = requests.get(url=url, headers=headers, timeout=10)
             response.raise_for_status()  # Raise HTTPError for bad responses
         except requests.exceptions.HTTPError as http_err:
-            logging.error(f"HTTP error occurred: {http_err}")
+            logger.error(f"HTTP error occurred: {http_err}")
         except requests.exceptions.RequestException as req_err:
-            logging.error(f"Request error occurred: {req_err}")
+            logger.error(f"Request error occurred: {req_err}")
         except Exception as err:
-            logging.error(f"An unexpected error occurred: {err}")
+            logger.error(f"An unexpected error occurred: {err}")
         else:
             return response
-        return None
+        return response
 
     @staticmethod
     def verify_siren(siren : (int | str)) -> bool:
@@ -357,8 +352,8 @@ class InseeClient:
         url = f"{InseeClient.__base_url}{data_type}?{query_string}"
 
         # Logging the request
-        msg = f" Fetching bulk {data_type.upper()} data..."
-        logging.info(msg)
+        msg = f"Fetching bulk {data_type.upper()} data..."
+        logger.info(msg)
         context = f"Fetching bulk {data_type.upper()} data from {url} | [{self.content_type}]"
 
         # Make the request
@@ -366,10 +361,12 @@ class InseeClient:
 
         # Handle response
         if self.content_type == "json":
+            # Handle errors
             if response.status_code >= RESPONSE_CODES["BAD_REQUEST"]:
                 status_code = f"Response code: {response.status_code}"
                 description = f"Description: {response.json()['header']['message']}"
-                logging.error(str(status_code), " - " ,str(description))
+                msg = f"{status_code} - {description}"
+                logger.error(msg)
                 return None
 
             # Return the appropriate data based on the type
@@ -437,13 +434,13 @@ class InseeClient:
         url = f"{InseeClient.__base_url}{data_type}/{id_code}?{query_string}"
 
         # Logging the request
-        logging.info(" Fetching legal data for siren number " + str(id_code))  # noqa: G003
+        logger.info("Fetching legal data for siren number " + str(id_code))  # noqa: G003
         context = f"Fetching {data_type.upper()} data from {url} | [{self.content_type}]"
 
         # Make the request
         response = self._get_request(url=url, headers=self.headers, context=context)
         if not response:
-            logging.error(" Error fetching legal data for siren number %s", str(id_code))
+            logger.error(" Error fetching legal data for siren number %s", str(id_code))
             return None
 
         # Handle response
