@@ -182,19 +182,6 @@ class InseeClient:
             msg = "Failed to authenticate with INSEE API."
             raise ValueError(msg)
 
-    def _save_meta_data(self, meta_data: dict) -> None:
-        """Save the meta data.
-
-        Save the meta data contains information about the API response.
-
-        Args:
-            meta_data (dict): The meta data for the API response (json).
-
-        Returns:
-            None
-        """
-        # To be implemented
-
 
     def _set_headers(self, content_type: str = "json") -> None:
         """Set headers according to the content type.
