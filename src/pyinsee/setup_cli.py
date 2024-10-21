@@ -43,7 +43,7 @@ def create_or_update_env_file(env_path: Path, consumer_key: str = '', consumer_s
         else:
             print(f"Current value for {var}: {current_value}")
 
-        # Prompt user for a new value apear as **** if the variable name matches specific keys
+        # Prompt user for a new value apear as blank if the variable name matches specific keys
         if var in ["CONSUMER_KEY", "CONSUMER_SECRET"]:
             new_value = getpass(f"Update {var} (leave empty to keep current): ").strip()
         else:
