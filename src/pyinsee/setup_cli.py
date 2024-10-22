@@ -67,13 +67,12 @@ def update_env_file(env_path: Path, consumer_key: str = '', consumer_secret: str
         # Mask API keys if the variable name matches specific keys
         if var in ["CONSUMER_KEY", "CONSUMER_SECRET"]:
             masked_value = f"{current_value[:4]}{'*' * (len(current_value) - 8)}{current_value[-4:]}" if len(current_value) > 8 else current_value
-            print(f"Current value for {var}: {masked_value}")
+            print(f"Current value for {var}: {masked_value if masked_value else 'None'}")
         else:
-            print(f"Current value for {var}: {current_value}")
-
+            print(f"Current value for {var}: {current_value if current_value else 'None'}")
         # Prompt user for a new value apear as blank if the variable name matches specific keys
         if var in ["CONSUMER_KEY", "CONSUMER_SECRET"]:
-            new_value = getpass(f"Update {var} (leave empty to keep current): ").strip()
+            new_value = input(f"Update {var} (leave empty to keep current): ").strip()
         else:
             new_value = input(f"Update {var} (leave empty to keep current): ").strip()
         
