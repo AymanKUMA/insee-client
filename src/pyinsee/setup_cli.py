@@ -68,23 +68,25 @@ def print_example() -> None:
     Returns:
         None
     """
-    env_example = """"
-    # The follwing are the basic env variables that must be specified upon the 
-    # first usage of the project
+    env_example = """
+    Here is the example .env file:
 
-    # Data output directory
-    DATA_DIR=path/to/\data
-    
-    # Insee API consumer key
-    CONSUMER_KEY=<your_consumer_key>
-    
-    # Insee API consumer secret
-    CONSUMER_SECRET=<your_consumer_secret>
-    
-    # The basic API url that is automatically set to the follwing
-    INSEE_DATA_URL = "https://api.insee.fr/entreprises/sirene/V3.11/"
+        # The follwing are the basic env variables that must be specified upon the 
+        # first usage of the project
+
+        # Data output directory
+        DATA_DIR=path/to/\\data
+
+        # Insee API consumer key
+        CONSUMER_KEY=<your_consumer_key>
+
+        # Insee API consumer secret
+        CONSUMER_SECRET=<your_consumer_secret>
+
+        # The basic API url that is automatically set to the follwing
+        INSEE_DATA_URL = "https://api.insee.fr/entreprises/sirene/V3.11/"
     """
-    print("Here is the example .env file:")
+
     print(env_example)
 
 def create_default_env_file(env_file_path: Path) -> None:
