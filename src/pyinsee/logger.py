@@ -44,10 +44,12 @@ logging_config = {
     },
     'handlers': {
         'file_handler': {
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'standard',
             'filename': LOG_FILE,
             'level': 'DEBUG',
+            'maxBytes': 5 * 1024 * 1024,  # 5MB
+            'backupCount': 5,
         },
         'console': {
             'class': 'logging.StreamHandler',
@@ -66,3 +68,4 @@ logging.config.dictConfig(logging_config)
 
 # Define a global logger
 logger = logging.getLogger(__name__)
+
