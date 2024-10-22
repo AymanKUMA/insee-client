@@ -17,7 +17,7 @@ logging.getLogger(__name__)
 
 def get_env_file_path():
     """Load the path to the default.env file from the package directory."""
-    package_dir = Path(__file__).parent # Directory where this default env file is located
+    package_dir = Path(__file__)# Directory where this default env file is located
     default_env_path = package_dir / "default.env"
     
     if not default_env_path.exists():

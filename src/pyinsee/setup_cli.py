@@ -96,7 +96,7 @@ def create_default_env_file(env_file_path: Path) -> None:
     Returns:
         None
     """
-    package_dir: Path = Path(__file__).parent
+    package_dir: Path = Path(__file__)
     default_env_path: Path = package_dir / "default.env"
     
     with open(default_env_path, 'w') as f:
