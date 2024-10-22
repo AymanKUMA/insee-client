@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import pprint
 import sys
 from pathlib import Path
 
@@ -109,7 +110,6 @@ def save_metadata(response: requests.Response, data_type: str, response_type: st
         None
     """
     if response_type == "json":
-        logger.info(type(response[1]))
         meta_data = json.loads(json.dumps(response[1]))
         save_data(data=meta_data,
                               filename=f"insee_metadata_{data_type}.json",
@@ -134,12 +134,14 @@ def main() -> None:
     ██████╗ ██╗   ██╗██╗███╗   ██╗███████╗███████╗███████╗
     ██╔══██╗╚██╗ ██╔╝██║████╗  ██║██╔════╝██╔════╝██╔════╝
     ██████╔╝ ╚████╔╝ ██║██╔██╗ ██║███████╗█████╗  █████╗  
-    ██╔═══╝   ╚██╔╝  ██║██║╚██╗██║╚════██║██╔══╝  ██╔══╝  
+    ██╔═══╝   ╚██╔╝  ██║██║╚██╗██║╚════██║██╔══╝  ██╔══╝
     ██║        ██║   ██║██║ ╚████║███████║███████╗███████╗
     ╚═╝        ╚═╝   ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝
-    pyinsee v0.1.0   |   github.com/AymanKUMA/insee-client
+     ...  .    .     |    pyinsee v0.1.0
+    :     :    :     |    github.com/AymanKUMA/insee-client
+     '''  '''' '     |    Welcome to the INSEE API CLI
     ------------------------------------------------------
-    Welcome to the INSEE API CLI application . . . . . . . 
+    
     """
 
     print(title)
@@ -170,19 +172,26 @@ def main() -> None:
                               response_type=args.content_type,
                               response_data_type=args.data_type)
                 if args.content_type == "json":
-                    data_list = response[0]
-                    data_dict = {}
-                    for item in data_list:
-                        data_dict[item["siren"]] = item
                     if args.save:
+                        data_list = response[0]
+                        data_dict = {}
+                        for item in data_list:
+                            data_dict[item["siren"]] = item
+
                         save_data(data=data_dict, 
                               filename=f"{args.data_type}_{args.content_type}_{get_today_date()}.{args.content_type}", 
                               response_type=args.content_type, response_data_type=args.data_type)
+                    else:
+                        pprint.pprint(response[0])
+                    
                 else:
                     if args.save:
                         save_data(data=response[0].decode("utf-8"),
                               filename=f"{args.data_type}_{args.content_type}_{get_today_date()}.{args.content_type}",
                               response_type=args.content_type, response_data_type=args.data_type)
+                    else:
+                        print(type(response[0].decode("utf-8")))
+                        print(response[0].decode("utf-8").replace("\\n", "\n"))
 
         except ValueError as e:
             msg = f"Error: {e}"

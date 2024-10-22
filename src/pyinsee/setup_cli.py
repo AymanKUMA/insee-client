@@ -2,8 +2,36 @@ import argparse
 from getpass import getpass
 from pathlib import Path
 
-def create_or_update_env_file(env_path: Path, consumer_key: str = '', consumer_secret: str = '', insee_data_url: str = '', data_dir: str = '') -> None:
-    """Creates or updates the .env file with user-provided environment variables.
+def create_env_file(env_path: Path, consumer_key: str, consumer_secret: str, insee_data_url: str, data_dir: str) -> None:
+    """Creates the .env file with user-provided environment variables.
+
+    Args:
+        env_path (Path): The path to the .env file.
+        consumer_key (str): The consumer key.
+        consumer_secret (str): The consumer secret.
+        insee_data_url (str): The INSEE data URL.
+        data_dir (str): The data directory.
+
+    Returns:
+        None
+    """
+    with open(env_path, 'w') as file:
+        file.write(f"DATA_DIR={data_dir}\n")
+        file.write(f"CONSUMER_KEY={consumer_key}\n")
+        file.write(f"CONSUMER_SECRET={consumer_secret}\n")
+        file.write(f"INSEE_DATA_URL={insee_data_url}\n")
+    
+    # Create data directory
+    create_data_directory(data_dir)
+
+    # create default.env file
+    create_default_env_file(env_path)
+    
+    # Print success message
+    print(f".env file created at: {env_path}")
+
+def update_env_file(env_path: Path, consumer_key: str = '', consumer_secret: str = '', insee_data_url: str = '', data_dir: str = '') -> None:
+    """Updates the .env file with user-provided environment variables.
 
     Args:
         env_path (Path): The path to the .env file.
@@ -16,7 +44,7 @@ def create_or_update_env_file(env_path: Path, consumer_key: str = '', consumer_s
         None
     """
     existing_vars = {}
-    
+
     # Load existing environment variables if the file exists
     if env_path.exists():
         with open(env_path) as f:
@@ -39,13 +67,12 @@ def create_or_update_env_file(env_path: Path, consumer_key: str = '', consumer_s
         # Mask API keys if the variable name matches specific keys
         if var in ["CONSUMER_KEY", "CONSUMER_SECRET"]:
             masked_value = f"{current_value[:4]}{'*' * (len(current_value) - 8)}{current_value[-4:]}" if len(current_value) > 8 else current_value
-            print(f"Current value for {var}: {masked_value}")
+            print(f"Current value for {var}: {masked_value if masked_value else 'None'}")
         else:
-            print(f"Current value for {var}: {current_value}")
-
+            print(f"Current value for {var}: {current_value if current_value else 'None'}")
         # Prompt user for a new value apear as blank if the variable name matches specific keys
         if var in ["CONSUMER_KEY", "CONSUMER_SECRET"]:
-            new_value = getpass(f"Update {var} (leave empty to keep current): ").strip()
+            new_value = input(f"Update {var} (leave empty to keep current): ").strip()
         else:
             new_value = input(f"Update {var} (leave empty to keep current): ").strip()
         
@@ -60,7 +87,11 @@ def create_or_update_env_file(env_path: Path, consumer_key: str = '', consumer_s
         for var, value in env_vars.items():
             file.write(f"{var}={value}\n")
     
-    print(f".env file created/updated at: {env_path}")
+    # create default.env file
+    create_default_env_file(env_path)
+
+    # Print success message	
+    print(f".env file updated at: {env_path}")
 
 def print_example() -> None:
     """Prints the default .env file.
@@ -68,10 +99,26 @@ def print_example() -> None:
     Returns:
         None
     """
-    path_to_example: Path = Path(__file__).parents[2] / "example.env"
-    print("Here is the example .env file:")
-    for line in path_to_example.read_text().splitlines():
-        print(line)
+    env_example = """
+    Here is the example .env file:
+
+        # The follwing are the basic env variables that must be specified upon the 
+        # first usage of the project
+
+        # Data output directory
+        DATA_DIR=path/to/\\data
+
+        # Insee API consumer key
+        CONSUMER_KEY=<your_consumer_key>
+
+        # Insee API consumer secret
+        CONSUMER_SECRET=<your_consumer_secret>
+
+        # The basic API url that is automatically set to the follwing
+        INSEE_DATA_URL = "https://api.insee.fr/entreprises/sirene/V3.11/"
+    """
+
+    print(env_example)
 
 def create_default_env_file(env_file_path: Path) -> None:
     """Creates a default.env file with the path to the .env file if it doesn't exist.
@@ -82,7 +129,9 @@ def create_default_env_file(env_file_path: Path) -> None:
     Returns:
         None
     """
-    package_dir: Path = Path(__file__).parent
+    import site
+    package_dir: Path = Path(site.getsitepackages()[0])
+    print(f"Creating a default.env file in: {package_dir}")
     default_env_path: Path = package_dir / "default.env"
     
     with open(default_env_path, 'w') as f:
@@ -126,7 +175,7 @@ def setup_env(env_path: Path = Path(".env")) -> None:
         update = input(f"File exists at given path: {env_file_path}\nDo you want to update the existing .env file? (yes/no): ").strip().lower()
         
         if update == 'yes':
-            create_or_update_env_file(env_file_path)  # Call the function to handle updates
+            update_env_file(env_file_path)  # Call the function to handle updates
         else:
             print("No updates made to the .env file.")
     else:
@@ -139,7 +188,7 @@ def setup_env(env_path: Path = Path(".env")) -> None:
         
         # Create data directory
         create_data_directory(data_dir)
-        create_or_update_env_file(env_file_path, consumer_key, consumer_secret, insee_data_url, data_dir)
+        create_env_file(env_file_path, consumer_key, consumer_secret, insee_data_url, data_dir)
     
 def create_data_directory(base_dir: str) -> None:
     """
@@ -188,7 +237,20 @@ def main():
     
     Returns: None
     """
-    print("Welcome to the .env setup CLI!")
+    print("""
+
+    ██████╗ ██╗   ██╗██╗███╗   ██╗███████╗███████╗███████╗
+    ██╔══██╗╚██╗ ██╔╝██║████╗  ██║██╔════╝██╔════╝██╔════╝
+    ██████╔╝ ╚████╔╝ ██║██╔██╗ ██║███████╗█████╗  █████╗  
+    ██╔═══╝   ╚██╔╝  ██║██║╚██╗██║╚════██║██╔══╝  ██╔══╝
+    ██║        ██║   ██║██║ ╚████║███████║███████╗███████╗
+    ╚═╝        ╚═╝   ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝
+     ...  .    .     |    pyinsee v0.1.0
+    :     :    :     |    github.com/AymanKUMA/insee-client
+     '''  '''' '     |    Welcome to the .env setup CLI!
+    ------------------------------------------------------
+
+    """)
     setup_env()
 
 if __name__ == "__main__":

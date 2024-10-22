@@ -9,6 +9,7 @@ API key.
 import os
 import logging
 from pathlib import Path
+import site
 from dotenv import load_dotenv
 
 # setting up the logger
@@ -17,8 +18,8 @@ logging.getLogger(__name__)
 
 def get_env_file_path():
     """Load the path to the default.env file from the package directory."""
-    package_dir = Path(__file__).parent # Directory where this default env file is located
-    default_env_path = package_dir / "default.env"
+    package_dir : Path = Path(site.getsitepackages()[0]) # Directory where this default env file is located
+    default_env_path : Path = package_dir / "default.env"
     
     if not default_env_path.exists():
         raise FileNotFoundError(f"default.env file not found at: {default_env_path}")
