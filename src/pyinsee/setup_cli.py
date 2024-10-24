@@ -131,7 +131,10 @@ def create_default_env_file(env_file_path: Path) -> None:
     Returns:
         None
     """
-    package_dir: Path = Path(site.getsitepackages()[0])
+    if site.ENABLE_USER_SITE:
+        package_dir: Path = Path(site.getusersitepackages())
+    else:
+        package_dir: Path = Path(site.getsitepackages()[0])
     print(f"Creating a default.env file in: {package_dir}")
     default_env_dir: Path = package_dir / "default-env-files"
     default_env_dir.mkdir(parents=True, exist_ok=True)
