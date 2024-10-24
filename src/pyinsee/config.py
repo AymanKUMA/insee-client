@@ -18,7 +18,10 @@ logging.getLogger(__name__)
 
 def get_env_file_path():
     """Load the path to the default.env file from the package directory."""
-    package_dir : Path = Path(site.getsitepackages()[0]) # Directory where this default env file is located
+    if site.ENABLE_USER_SITE:
+        package_dir = Path(site.getusersitepackages())
+    else:
+        package_dir = Path(site.getsitepackages()[0])
     default_env_path : Path = package_dir / "default-env-files" / "default.env"
     
     if not default_env_path.exists():
