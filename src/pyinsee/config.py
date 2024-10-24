@@ -33,7 +33,7 @@ DEFAULT_ENV_PATH = get_env_file_path()
 
 load_dotenv(dotenv_path=DEFAULT_ENV_PATH)
 ENV_FILE_PATH = os.getenv("PYINSEE_ENV_FILE_PATH")
-print(ENV_FILE_PATH)
+
 if ENV_FILE_PATH is None:
     msg = "ENV_FILE_PATH is not set in the environment variables."
     raise ValueError(msg)
