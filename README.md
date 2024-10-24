@@ -29,7 +29,7 @@ To run this project, you will need to add the following environment variables to
 
 The Insee Client package provides a command-line interface (CLI) for setting up environment variables. You can use the CLI by running the following command:
 
-```bash
+```
 user@machine:~$ setup-cli --help
 
 
@@ -76,7 +76,7 @@ Once the environment variables are available you can start using the insee-cli o
 ### Insee CLI
 
 Using insee cli you can either retrive bulk data, or a single data either by "*siren*" or "*siret*": 
-```bash
+```
    usage: insee-cli [-h] {insee_get_bulk,insee_get_by_number} ...
 
    CLI for querying INSEE data.
@@ -91,7 +91,7 @@ Using insee cli you can either retrive bulk data, or a single data either by "*s
 ```
 
 The first option is getting bulk data: 
-```bash
+```
     usage: insee-cli insee_get_bulk [-h] [--q Q] [--date DATE] [--curseur CURSEUR] [--debut DEBUT] [--nombre NOMBRE]
                                     [--tri [TRI ...]] [--champs [CHAMPS ...]] [--facette [FACETTE ...]] [--mvn MVN]
                                     [--save SAVE]
@@ -119,13 +119,4 @@ The first option is getting bulk data:
 
 If the argument '**save**' is not provided the CLI display the results. Note that the data is saved in the directory *data/raw/...*
 
-
-
-```python
-from pyinsee import insee_client.InseeClient
-
-function App() {
-  return <Component />
-}
-```
 
