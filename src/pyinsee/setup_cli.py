@@ -140,7 +140,7 @@ def create_default_env_file(env_file_path: Path) -> None:
     default_env_dir.mkdir(parents=True, exist_ok=True)
     default_env_path: Path = default_env_dir / "default.env"
     
-    with open(default_env_path, 'r+') as f:
+    with open(default_env_path, 'w+') as f:
         lines = f.readlines()
         changed = False
         for i, line in enumerate(lines):
