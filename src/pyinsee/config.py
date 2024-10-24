@@ -19,7 +19,7 @@ logging.getLogger(__name__)
 def get_env_file_path():
     """Load the path to the default.env file from the package directory."""
     package_dir : Path = Path(site.getsitepackages()[0]) # Directory where this default env file is located
-    default_env_path : Path = package_dir / "default.env"
+    default_env_path : Path = package_dir / "default-env-files" / "default.env"
     
     if not default_env_path.exists():
         raise FileNotFoundError(f"default.env file not found at: {default_env_path}")
@@ -29,7 +29,7 @@ def get_env_file_path():
 DEFAULT_ENV_PATH = get_env_file_path()
 
 load_dotenv(dotenv_path=DEFAULT_ENV_PATH)
-ENV_FILE_PATH = os.getenv("ENV_FILE_PATH")
+ENV_FILE_PATH = os.getenv("PYINSEE_ENV_FILE_PATH")
 if ENV_FILE_PATH is None:
     msg = "ENV_FILE_PATH is not set in the environment variables."
     raise ValueError(msg)

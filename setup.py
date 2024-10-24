@@ -10,7 +10,7 @@ setup(
     name="pyinsee",
     version="0.1.0",
     description="A package for collecting and processing company data from INSEE API",
-    long_description=open('README.md').read(),
+    long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
     author="Ayman KUMA",
     author_email="aymankamel.mail@example.com",

@@ -1,4 +1,6 @@
 import argparse
+import os
+import site
 from getpass import getpass
 from pathlib import Path
 
@@ -129,13 +131,23 @@ def create_default_env_file(env_file_path: Path) -> None:
     Returns:
         None
     """
-    import site
     package_dir: Path = Path(site.getsitepackages()[0])
     print(f"Creating a default.env file in: {package_dir}")
-    default_env_path: Path = package_dir / "default.env"
+    default_env_dir: Path = package_dir / "default-env-files"
+    default_env_dir.mkdir(parents=True, exist_ok=True)
+    default_env_path: Path = default_env_dir / "default.env"
     
-    with open(default_env_path, 'w') as f:
-        f.write(f"ENV_FILE_PATH={env_file_path}")
+    with open(default_env_path, 'r+') as f:
+        lines = f.readlines()
+        changed = False
+        for i, line in enumerate(lines):
+            if "PYINSEE_ENV_FILE_PATH=" in line:
+                lines[i] = f"PYINSEE_ENV_FILE_PATH={env_file_path}\n"
+                changed = True
+        if not changed:
+            lines.append(f"PYINSEE_ENV_FILE_PATH={env_file_path}\n")
+        f.seek(0)
+        f.writelines(lines)
     print(f"default.env file created/updated at: {default_env_path}")
 
 def setup_env(env_path: Path = Path(".env")) -> None:
