@@ -9,7 +9,7 @@ from .config import DEFAULT_ENV_PATH
 # Load environment variables from default.env file
 load_dotenv(dotenv_path=DEFAULT_ENV_PATH)
 # Getting .evn file path
-ENV_FILE_PATH = os.getenv("ENV_FILE_PATH")
+ENV_FILE_PATH = os.getenv("PYINSEE_ENV_FILE_PATH")
 if ENV_FILE_PATH is None:
     raise ValueError("ENV_FILE_PATH is not set in the environment variables.")
 

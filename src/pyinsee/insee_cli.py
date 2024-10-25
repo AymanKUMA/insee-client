@@ -4,15 +4,12 @@ from __future__ import annotations
 import json
 import pprint
 import sys
+import argparse
 from pathlib import Path
-
 import requests
 sys.path.append(str(Path(__file__).parent.parent))
 
-import argparse
 from .logger import logger
-import sys
-
 from .insee_client import InseeClient
 from .utils import get_today_date, save_data
 
@@ -75,9 +72,6 @@ def parse_args() -> argparse.Namespace:
     by_number_parser.add_argument("data_type",
                                   choices=["siren", "siret"],
                                   help="Type of data to retrieve")
-    by_number_parser.add_argument("content_type",
-                                  choices=["json", "csv"],
-                                  help="Content type of the response")
     by_number_parser.add_argument("id_code",
                                   type=str,
                                   help="ID code of the company")
@@ -147,7 +141,10 @@ def main() -> None:
     print(title)
 
     # Create an instance of InseeClient
-    client = InseeClient(content_type=args.content_type)
+    if args.command == "insee_get_by_number":
+        client = InseeClient(content_type="json")
+    else:
+        client = InseeClient(content_type=args.content_type)
 
     if args.command == "insee_get_bulk":
         kwargs = {k: v for k, v in vars(args).items() if k not in ["data_type",
@@ -216,7 +213,22 @@ def main() -> None:
             response = client.get_by_number(data_type=args.data_type,
                                             id_code=args.id_code,
                                             **kwargs)
-            logger.info(response)
+            content_type = "json"
+            if response is not None:
+                save_metadata(response=response, 
+                              data_type=args.data_type, 
+                              response_type=content_type,
+                              response_data_type=args.data_type)
+                if args.save:
+                    data_list = response[0]
+                    data_dict = {}
+                    for item in data_list:
+                        data_dict[item["siren"]] = item
+                    save_data(data=data_dict, 
+                          filename=f"{args.data_type}_{args.id_code}_{get_today_date()}.{content_type}", 
+                          response_type=args.content_type, response_data_type=args.data_type)
+                else:
+                        pprint.pprint(response[0])
             if args.save:
                 save_data(data=response, 
                               filename=f"{args.data_type}_{args.content_type}_{get_today_date()}.{args.content_type}", 
