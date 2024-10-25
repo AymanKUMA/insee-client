@@ -9,7 +9,7 @@ from .config import DEFAULT_ENV_PATH
 # Load environment variables from default.env file
 load_dotenv(dotenv_path=DEFAULT_ENV_PATH)
 # Getting .evn file path
-ENV_FILE_PATH = os.getenv("ENV_FILE_PATH")
+ENV_FILE_PATH = os.getenv("PYINSEE_ENV_FILE_PATH")
 if ENV_FILE_PATH is None:
     raise ValueError("ENV_FILE_PATH is not set in the environment variables.")
 
@@ -44,10 +44,12 @@ logging_config = {
     },
     'handlers': {
         'file_handler': {
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'standard',
             'filename': LOG_FILE,
             'level': 'DEBUG',
+            'maxBytes': 5 * 1024 * 1024,  # 5MB
+            'backupCount': 5,
         },
         'console': {
             'class': 'logging.StreamHandler',
@@ -66,3 +68,4 @@ logging.config.dictConfig(logging_config)
 
 # Define a global logger
 logger = logging.getLogger(__name__)
+

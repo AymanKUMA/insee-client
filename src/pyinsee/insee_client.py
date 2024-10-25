@@ -34,9 +34,7 @@ from __future__ import annotations
 import base64
 import json
 from .logger import logger
-import pprint  # noqa: F401
 from typing import ClassVar, TypedDict
-
 import requests
 
 from .config import (
@@ -181,19 +179,6 @@ class InseeClient:
             logger.error(msg)
             msg = "Failed to authenticate with INSEE API."
             raise ValueError(msg)
-
-    def _save_meta_data(self, meta_data: dict) -> None:
-        """Save the meta data.
-
-        Save the meta data contains information about the API response.
-
-        Args:
-            meta_data (dict): The meta data for the API response (json).
-
-        Returns:
-            None
-        """
-        # To be implemented
 
 
     def _set_headers(self, content_type: str = "json") -> None:

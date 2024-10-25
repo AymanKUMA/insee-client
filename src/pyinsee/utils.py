@@ -1,7 +1,6 @@
 """Utility functions for the company_data_collection package."""
 from __future__ import annotations
 
-import csv
 import datetime as dt
 import json
 import os
@@ -106,17 +105,18 @@ class QueryBuilder:
 
         return "&".join(query_string_parts)
 
-def _get_today_date() -> str:
-    """Get the current date.
+def get_today_date() -> str:
+    """Get the current date and time.
 
     Returns:
-        str: The current date in the format YYYY-MM-DD.
+        str: The current date and time in the format YYYY-MM-DDTHH:MM:SS.
     """
     now = dt.datetime.now(tz=dt.datetime.now().astimezone().tzinfo)
-    return now.strftime("%Y-%m-%d")
+    return now.strftime("%Y_%m%dT%H%M%S")
 
-def save_data(data: dict,
+def save_data(data: dict | str,
               filename: str,
+              response_data_type: str,
               response_type: str = "json",
               data_type: str = "raw") -> None:
     """Save data to a file.
@@ -135,32 +135,43 @@ def save_data(data: dict,
     if data_type == "logs":
         save_dir = os.path.join(Path(DATA_DIR), "logs")
     elif data_type == "metadata":
-        save_dir = os.path.join(Path(DATA_DIR), "metadata")
+        save_dir = os.path.join(Path(DATA_DIR), "metadata", "insee")
     elif data_type == "processed":
-        save_dir = os.path.join(Path(DATA_DIR), "processed")
+        save_dir = os.path.join(Path(DATA_DIR), "processed", "insee", response_data_type, response_type)
     else:  # Default to raw
-        save_dir = os.path.join(Path(DATA_DIR), "raw")
-    
-    print(save_dir)
+        save_dir = os.path.join(Path(DATA_DIR), "raw", "insee", response_data_type, response_type)
+
+    # Create the directory if it doesn't exist
+    if not os.path.exists(save_dir):
+        try:
+            os.makedirs(save_dir)
+        except OSError as e:
+            logger.error("Error creating directory %s: %s", save_dir, e)
+            raise
 
     # Build the full file path
     file_path = Path(save_dir) / filename
 
     # Save the data
     if response_type == "json":
-        logger.info("Saving data to %s...", file_path)
-        with file_path.open("w") as f:
-            json.dump(data, f)
+        try:
+            logger.debug("Saving data to %s...", file_path)
+            with file_path.open("w") as f:
+                json.dump(data, f, indent=8)
+        except (OSError, TypeError) as e:
+            logger.error("Error saving data to %s: %s", file_path, e)
+            raise
     elif response_type == "csv":
-        logger.info("Saving data to %s...", file_path)
-        with file_path.open("w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerows(data)
+        try:
+            logger.debug("Saving data to %s...", file_path)
+            with file_path.open("w", newline="") as f:
+                f.write(data)
+        except (OSError, TypeError) as e:
+            logger.error("Error saving data to %s: %s", file_path, e)
+            raise
     else:
-        msg = "Unsupported response_type. Must be 'json' or 'csv'."
-        raise ValueError(msg)
-
-    logger.info(" Data successfully saved to %s", file_path)
+        logger.error("Unsupported response_type. Must be 'json' or 'csv'.")
+        raise ValueError("Unsupported response_type. Must be 'json' or 'csv'.")
 
 if __name__ == "__main__":
     # Saving raw data
