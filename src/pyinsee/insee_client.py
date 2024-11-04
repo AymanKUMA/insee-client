@@ -163,9 +163,9 @@ class InseeClient:
         if response.status_code == cls.__response_codes["OK"]:
             try:
                 data = response.json()
-                msg = f" Expires in: {data.get("expires_in")} Seconds"
+                msg = f" Expires in: {data.get('expires_in')} Seconds"
                 logger.warning(msg)
-                msg = f" Token type: {data.get("token_type")}"
+                msg = f" Token type: {data.get('token_type')}"
                 logger.warning(msg)
                 cls.__api_key = data.get("access_token")
                 logger.info("API key retrieved successfully.")
@@ -174,8 +174,7 @@ class InseeClient:
                 msg = "Invalid API response."
                 raise ValueError(msg) from json.JSONDecodeError
         else:
-            msg = f"Failed to authenticate with INSEE: {
-                response.status_code}, {response.text}"
+            msg = f"Failed to authenticate with INSEE: {response.status_code}, {response.text}"
             logger.error(msg)
             msg = "Failed to authenticate with INSEE API."
             raise ValueError(msg)
