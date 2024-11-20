@@ -22,8 +22,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'setup-cli=pyinsee.setup_cli:main',
-            'insee-cli=pyinsee.insee_cli:main',
+            'pyinsee-setup-cli=pyinsee.setup_cli:main',
+            'pyinsee-cli=pyinsee.insee_cli:main',
         ],
     },
     include_package_data=True,
