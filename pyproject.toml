@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyinsee"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A package for collecting and processing company data from INSEE API"
 readme = "README.md"
 authors = [{name = "Ayman KUMA", email = "aymankamel.mail@example.com"}]
@@ -20,6 +20,9 @@ dependencies = [
     "python-dotenv",
 ]
 requires-python = ">=3.8"
+
+[tool.setuptools_scm]
+version_file = "src/pyinsee/_version.py"
 
 [project.urls]
 Homepage = "https://github.com/AymanKUMA/insee-client"
