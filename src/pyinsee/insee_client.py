@@ -1,33 +1,26 @@
 """This module contains the legal data API client.
 
 To use the API, you need to register for an API key at
-https://api.insee.fr/ and then set the API_KEY variable in utils.py to your
-API key.
+https://api.insee.fr/ and then set the API_KEY or CLIENT_KEY and CLIENT_SECRET variables using the setup cli to your
+corresponding credentials.
 
 Example:
-    from apis.legal_data.insee_client import InseeClient
-    ld = LegalData(content_type="json")
+    from pyinsee.insee_client import InseeClient
+    
+    # get bulk data
+    client_bulk = InseeClient()
+    bulk_data, header = client_bulk.get_bulk(
+        data_type="siren",
+        nombre = 5,
+        date = "2022-01-01",
+        )
 
-    siren = "123456789"
-    siret = "12345678901234"
-
-    ld.get_bulk_data(data_type = "siren",
-                     debut = 0,
-                     nombre = 5,
-                     date = "2022-01-01",
-                     )
-
-    ld.get_legal_data(data_type = "siren",
-                      id_code = siren,
-                      )
-
-    lg.get_bulk_data(data_type = "siret",
-                     nombre = 5,
-                     date = "2022-01-01",
-                     )
-    ld.get_legal_data(data_type = "siret",
-                      id_code = siret,
-                      )
+    # get by number
+    client_by_number = InseeClient()
+    siren_data = client_by_number.get_by_number(
+        data_type="siren",
+        id_code = "000325175",
+    )
 """
 from __future__ import annotations
 
@@ -457,13 +450,9 @@ if __name__ == "__main__":
         nombre = 5,
         date = "2022-01-01",
         )
-    # pprint.pprint(bulk_data)
 
     client_by_number = InseeClient()
     siren_data = client_by_number.get_by_number(
         data_type="siren",
         id_code = "000325175",
     )
-
-    # pprint.pprint(siren_data)
-# ????????????????????????????????????????????????????????????????????????????

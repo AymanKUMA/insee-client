@@ -59,8 +59,6 @@ if INSEE_DATA_URL is None:
     msg = "INSEE_DATA_URL is not set in the environment variables."
     raise ValueError(msg)
 
-print(f"ULR: {INSEE_DATA_URL} : ORIGINAL https://api.insee.fr/api-sirene/3.11")
-
 if API_KEY is None:
     msg = "API_KEY is not set in the environment variables. Please set it in the .env file using the setup_cli script in case the OAuth2 flow is not working."
     logging.warning(msg)
