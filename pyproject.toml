@@ -25,8 +25,8 @@ requires-python = ">=3.8"
 Homepage = "https://github.com/AymanKUMA/insee-client"
 
 [project.scripts]
-setup-cli = "pyinsee.setup_cli:main"
-insee-cli = "pyinsee.insee_cli:main"
+py-insee-setup = "pyinsee.setup_cli:main"
+py-insee = "pyinsee.insee_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
