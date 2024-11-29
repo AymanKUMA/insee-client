@@ -18,36 +18,29 @@ logging.getLogger(__name__)
 
 def get_env_file_path():
     """Load the path to the default.env file from the package directory."""
-    paths = [
-        Path(site.getusersitepackages()),
-        *[Path(p) for p in site.getsitepackages()]
-    ]
+    if site.ENABLE_USER_SITE:
+        package_dir = Path(site.getusersitepackages())
+    else:
+        package_dir = Path(site.getsitepackages()[0])
+    default_env_path : Path = package_dir / "default-env-files" / "default.env"
     
-    for base_path in paths:
-        default_env_path = base_path / "default-env-files" / "default.env"
-        if default_env_path.exists():
-            return str(default_env_path)
-            
-    # If not found, create the file in user site packages
-    user_path = Path(site.getusersitepackages())
-    env_dir = user_path / "default-env-files"
-    env_dir.mkdir(parents=True, exist_ok=True)
+    if not default_env_path.exists():
+        logging.error(f"default.env file not found at: {default_env_path}")
     
-    default_env_path = env_dir / "default.env"
-    default_env_path.write_text("PYINSEE_ENV_FILE_PATH=.env")
-    
-    return str(default_env_path)
+    return str(default_env_path) if default_env_path.exists() else None
 
 DEFAULT_ENV_PATH = get_env_file_path()
+ENV_FILE_PATH = None
 
-load_dotenv(dotenv_path=DEFAULT_ENV_PATH)
-ENV_FILE_PATH = os.getenv("PYINSEE_ENV_FILE_PATH")
+if DEFAULT_ENV_PATH is not None:
+    load_dotenv(dotenv_path=DEFAULT_ENV_PATH)
+    ENV_FILE_PATH = os.getenv("PYINSEE_ENV_FILE_PATH")
 
-if ENV_FILE_PATH is None:
-    msg = "ENV_FILE_PATH is not set in the environment variables."
-    raise ValueError(msg)
+    if ENV_FILE_PATH is None:
+        msg = "ENV_FILE_PATH is not set in the environment variables."
+        raise ValueError(msg)
 
-load_dotenv(dotenv_path=ENV_FILE_PATH, override=True)
+load_dotenv(dotenv_path=ENV_FILE_PATH if ENV_FILE_PATH is not None else None, override=True)
 
 DATA_DIR = os.environ.get("DATA_DIR")
 API_KEY = os.environ.get("API_KEY")
