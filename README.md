@@ -34,9 +34,11 @@ setup-cli --help
 ```
 Output:
 ```
+
+
     ██████╗ ██╗   ██╗██╗███╗   ██╗███████╗███████╗███████╗
     ██╔══██╗╚██╗ ██╔╝██║████╗  ██║██╔════╝██╔════╝██╔════╝
-    ██████╔╝ ╚████╔╝ ██║██╔██╗ ██║███████╗█████╗  █████╗  
+    ██████╔╝ ╚████╔╝ ██║██╔██╗ ██║███████╗█████╗  █████╗
     ██╔═══╝   ╚██╔╝  ██║██║╚██╗██║╚════██║██╔══╝  ██╔══╝
     ██║        ██║   ██║██║ ╚████║███████║███████╗███████╗
     ╚═╝        ╚═╝   ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝
@@ -46,20 +48,21 @@ Output:
     ------------------------------------------------------
 
 
-usage: setup-cli [-h] [--env-path ENV_PATH] --data-dir DATA_DIR [--client-key CLIENT_KEY] [--client-secret CLIENT_SECRET] [--api-key API_KEY] [--api-url API_URL] [--overwrite]
+usage: py-insee-setup [-h] [--env-path ENV_PATH] --data-dir DATA_DIR [--client-key CLIENT_KEY] [--client-secret CLIENT_SECRET] [--api-key API_KEY] [--api-url API_URL] [--overwrite]
 
 Set up the .env file for the application.
 
 options:
-  -h, --help                    show this help message and exit
-  --env-path ENV_PATH           Path to the .env file.
-  --data-dir DATA_DIR           Path to the data directory.
-  --client-key CLIENT_KEY       client key for the API.
-  --client-secret CLIENT_SECRET client secret for the API.
-  --api-key API_KEY             API key for the API, set it up only in case the OAuth flow doesn't work.
-
-  --api-url API_URL             API base URL.
-  --overwrite                   Overwrite the existing .env file.
+  -h, --help            show this help message and exit
+  --env-path ENV_PATH   Path to the .env file.
+  --data-dir DATA_DIR   Path to the data directory.
+  --client-key CLIENT_KEY
+                        client key for the API.
+  --client-secret CLIENT_SECRET
+                        client secret for the API.
+  --api-key API_KEY     API key for the API, set it up only in case the OAuth flow doesn't work.
+  --api-url API_URL     API base URL.
+  --overwrite           Overwrite the existing .env file.
 ```
 
 Note that the .env file will be created automatically via the CLI. 
@@ -82,9 +85,9 @@ Once the environment variables are available you can start using the insee-cli o
 
 ### Insee CLI
 
-Using insee cli you can either retrive bulk data, or a single data either by "*siren*" or "*siret*": 
+Using py-insee cli you can either retrive bulk data, or a single data either by "*siren*" or "*siret*": 
 ```
-usage: insee-cli [-h] {insee_get_bulk,insee_get_by_number} ...
+usage: py-insee  [-h] {insee_get_bulk,insee_get_by_number} ...
 
 CLI for querying INSEE data.
 
@@ -100,7 +103,7 @@ options:
 
 The first option is getting bulk data: 
 ```
-usage: insee-cli insee_get_bulk [-h] [--q Q] [--date DATE] [--curse
+usage: py-insee  insee_get_bulk [-h] [--q Q] [--date DATE] [--curse
 CURSEUR] [--debut DEBUT] [--nombre NOMBRE] [--tri [TRI ...]] [--cham
 [CHAMPS ...]] [--facette [FACETTE ...]] [--mvn MVN] [--save SAVE]
                                 
@@ -130,7 +133,7 @@ options:
 The first option is getting data by number:
 
 ```
-usage: insee-cli insee_get_by_number [-h] [--date DATE] [--champs [CHAMPS ...]] [--mvn MVN] [--save SAVE] {siren,siret} id_code
+usage: py-insee insee_get_by_number [-h] [--date DATE] [--champs [CHAMPS ...]] [--mvn MVN] [--save SAVE] {siren,siret} id_code
 
 positional arguments:
   {siren,siret}         Type of data to retrieve
