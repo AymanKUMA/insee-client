@@ -38,10 +38,11 @@ from typing import ClassVar, TypedDict
 import requests
 
 from .config import (
-    CONSUMER_KEY,
-    CONSUMER_SECRET,
+    CLIENT_KEY,
+    CLIENT_SECRET,
     INSEE_DATA_URL,
     RESPONSE_CODES,
+    API_KEY,
 )
 from .utils import QueryBuilder
 
@@ -104,7 +105,7 @@ class InseeClient:
     __api_key: ClassVar[str | None] = None
     __base_url: ClassVar[str] = INSEE_DATA_URL
     __credentials: ClassVar[str] = base64.b64encode(
-        f"{CONSUMER_KEY}:{CONSUMER_SECRET}".encode()).decode("utf-8")
+        f"{CLIENT_KEY}:{CLIENT_SECRET}".encode()).decode("utf-8")
     __response_codes: ClassVar[dict] = RESPONSE_CODES
     __token_url: ClassVar[str] = "https://api.insee.fr/token"
 
@@ -131,7 +132,7 @@ class InseeClient:
 
         self.content_type = content_type
         self.headers = {
-            "Authorization": f"Bearer {InseeClient.__api_key}",
+            'X-INSEE-Api-Key-Integration': f"{InseeClient.__api_key}",
         }
         self._set_headers(content_type=content_type)
 
@@ -155,6 +156,7 @@ class InseeClient:
         headers = {
             "Authorization": f"Basic {cls.__credentials}",
             "Content-Type": "application/x-www-form-urlencoded",
+            "grant_type": "client_credentials",
         }
         data = {"grant_type": "client_credentials"}
 
@@ -176,8 +178,16 @@ class InseeClient:
         else:
             msg = f"Failed to authenticate with INSEE: {response.status_code}, {response.text}"
             logger.error(msg)
-            msg = "Failed to authenticate with INSEE API."
-            raise ValueError(msg)
+            msg = "Failed to authenticate with INSEE API. setting the api key from env variable."
+            logger.warning(msg)
+
+            # setting up the API key from the env variable if the retrieval fails
+            if API_KEY:
+                cls.__api_key = API_KEY 
+            else:
+                msg = "API_KEY is not set in the environment variables."
+                raise ValueError(msg)
+
 
 
     def _set_headers(self, content_type: str = "json") -> None:
