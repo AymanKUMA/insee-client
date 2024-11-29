@@ -38,25 +38,30 @@ if ENV_FILE_PATH is None:
     msg = "ENV_FILE_PATH is not set in the environment variables."
     raise ValueError(msg)
 
-load_dotenv(ENV_FILE_PATH)
+load_dotenv(dotenv_path=ENV_FILE_PATH, override=True)
 
 DATA_DIR = os.environ.get("DATA_DIR")
-CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
-CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
+API_KEY = os.environ.get("API_KEY")
+CLIENT_KEY = os.environ.get("CLIENT_KEY")
+CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
 INSEE_DATA_URL = os.environ.get("INSEE_DATA_URL")
 
 if DATA_DIR is None:
     msg = "DATA_DIR is not set in the environment variables."
     raise ValueError(msg)
-if CONSUMER_KEY is None:
-    msg = "CONSUMER_KEY is not set in the environment variables."
+if CLIENT_KEY is None:
+    msg = "CLIENT_KEY is not set in the environment variables."
     raise ValueError(msg)
-if CONSUMER_SECRET is None:
-    msg = "CONSUMER_SECRET is not set in the environment variables."
+if CLIENT_SECRET is None:
+    msg = "CLIENT_SECRET is not set in the environment variables."
     raise ValueError(msg)
 if INSEE_DATA_URL is None:
     msg = "INSEE_DATA_URL is not set in the environment variables."
     raise ValueError(msg)
+
+if API_KEY is None:
+    msg = "API_KEY is not set in the environment variables. Please set it in the .env file using the setup_cli script in case the OAuth2 flow is not working."
+    logging.warning(msg)
 
 # Set up the response codes
 RESPONSE_CODES = {

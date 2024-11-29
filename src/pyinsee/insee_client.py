@@ -1,33 +1,26 @@
 """This module contains the legal data API client.
 
 To use the API, you need to register for an API key at
-https://api.insee.fr/ and then set the API_KEY variable in utils.py to your
-API key.
+https://api.insee.fr/ and then set the API_KEY or CLIENT_KEY and CLIENT_SECRET variables using the setup cli to your
+corresponding credentials.
 
 Example:
-    from apis.legal_data.insee_client import InseeClient
-    ld = LegalData(content_type="json")
+    from pyinsee.insee_client import InseeClient
+    
+    # get bulk data
+    client_bulk = InseeClient()
+    bulk_data, header = client_bulk.get_bulk(
+        data_type="siren",
+        nombre = 5,
+        date = "2022-01-01",
+        )
 
-    siren = "123456789"
-    siret = "12345678901234"
-
-    ld.get_bulk_data(data_type = "siren",
-                     debut = 0,
-                     nombre = 5,
-                     date = "2022-01-01",
-                     )
-
-    ld.get_legal_data(data_type = "siren",
-                      id_code = siren,
-                      )
-
-    lg.get_bulk_data(data_type = "siret",
-                     nombre = 5,
-                     date = "2022-01-01",
-                     )
-    ld.get_legal_data(data_type = "siret",
-                      id_code = siret,
-                      )
+    # get by number
+    client_by_number = InseeClient()
+    siren_data = client_by_number.get_by_number(
+        data_type="siren",
+        id_code = "000325175",
+    )
 """
 from __future__ import annotations
 
@@ -38,10 +31,11 @@ from typing import ClassVar, TypedDict
 import requests
 
 from .config import (
-    CONSUMER_KEY,
-    CONSUMER_SECRET,
+    CLIENT_KEY,
+    CLIENT_SECRET,
     INSEE_DATA_URL,
     RESPONSE_CODES,
+    API_KEY,
 )
 from .utils import QueryBuilder
 
@@ -104,7 +98,7 @@ class InseeClient:
     __api_key: ClassVar[str | None] = None
     __base_url: ClassVar[str] = INSEE_DATA_URL
     __credentials: ClassVar[str] = base64.b64encode(
-        f"{CONSUMER_KEY}:{CONSUMER_SECRET}".encode()).decode("utf-8")
+        f"{CLIENT_KEY}:{CLIENT_SECRET}".encode()).decode("utf-8")
     __response_codes: ClassVar[dict] = RESPONSE_CODES
     __token_url: ClassVar[str] = "https://api.insee.fr/token"
 
@@ -131,7 +125,7 @@ class InseeClient:
 
         self.content_type = content_type
         self.headers = {
-            "Authorization": f"Bearer {InseeClient.__api_key}",
+            'X-INSEE-Api-Key-Integration': f"{InseeClient.__api_key}",
         }
         self._set_headers(content_type=content_type)
 
@@ -155,6 +149,7 @@ class InseeClient:
         headers = {
             "Authorization": f"Basic {cls.__credentials}",
             "Content-Type": "application/x-www-form-urlencoded",
+            "grant_type": "client_credentials",
         }
         data = {"grant_type": "client_credentials"}
 
@@ -176,8 +171,16 @@ class InseeClient:
         else:
             msg = f"Failed to authenticate with INSEE: {response.status_code}, {response.text}"
             logger.error(msg)
-            msg = "Failed to authenticate with INSEE API."
-            raise ValueError(msg)
+            msg = "Failed to authenticate with INSEE API. setting the api key from env variable."
+            logger.warning(msg)
+
+            # setting up the API key from the env variable if the retrieval fails
+            if API_KEY:
+                cls.__api_key = API_KEY 
+            else:
+                msg = "API_KEY is not set in the environment variables."
+                raise ValueError(msg)
+
 
 
     def _set_headers(self, content_type: str = "json") -> None:
@@ -447,13 +450,9 @@ if __name__ == "__main__":
         nombre = 5,
         date = "2022-01-01",
         )
-    # pprint.pprint(bulk_data)
 
     client_by_number = InseeClient()
     siren_data = client_by_number.get_by_number(
         data_type="siren",
         id_code = "000325175",
     )
-
-    # pprint.pprint(siren_data)
-# ????????????????????????????????????????????????????????????????????????????
